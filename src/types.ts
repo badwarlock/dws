@@ -1,12 +1,27 @@
 import { ReactNode } from 'react';
 
-export interface ComboboxItem {
+// Базовый интерфейс для элементов Combobox - минимальные требования
+export interface ComboboxItemBase {
+  id: string | number;
+}
+
+// Стандартный тип элемента с label для базового использования
+export interface ComboboxItem extends ComboboxItemBase {
   id: string | number;
   label: string;
   [key: string]: any;
 }
 
-export interface ComboboxProps<T extends ComboboxItem> {
+// Независимый тип для банковских счетов
+export interface Account {
+  id: string;
+  label: string;
+  iban: string;
+  type: string;
+  internal_number: number;
+}
+
+export interface ComboboxProps<T extends ComboboxItemBase> {
   items: T[];
   selectedItem: T | null;
   onSelectedItemChange: (item: T | null) => void;
@@ -21,12 +36,4 @@ export interface ComboboxProps<T extends ComboboxItem> {
   loading?: boolean;
   loadingText?: string;
   itemToString?: (item: T | null) => string;
-}
-
-export interface Account extends ComboboxItem {
-  id: string;
-  label: string;
-  iban: string;
-  type: string;
-  internal_number: number;
 }

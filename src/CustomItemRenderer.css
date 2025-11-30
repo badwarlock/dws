@@ -1,0 +1,104 @@
+.custom-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.custom-item:hover {
+  background-color: #f9fafb;
+}
+
+.custom-item--highlighted {
+  background-color: #dbeafe;
+}
+
+.custom-item__icon-wrapper {
+  flex-shrink: 0;
+}
+
+.custom-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  transition: transform 0.15s ease-in-out;
+}
+
+.custom-item--highlighted .custom-item__icon {
+  transform: scale(1.05);
+}
+
+.custom-item__icon-text {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.custom-item__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.custom-item__label {
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.15s ease-in-out;
+}
+
+.custom-item__description {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-item__check-icon {
+  flex-shrink: 0;
+  color: #3b82f6;
+  animation: customItemCheckAppear 0.2s ease-in-out;
+}
+
+@keyframes customItemCheckAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-item {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+
+  .custom-item__icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .custom-item__icon-text {
+    font-size: 13px;
+  }
+
+  .custom-item__label {
+    font-size: 13px;
+  }
+
+  .custom-item__description {
+    font-size: 11px;
+  }
+}

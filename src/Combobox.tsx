@@ -1,9 +1,9 @@
 import { useCombobox } from 'downshift';
 import { useMemo } from 'react';
-import { ComboboxItem, ComboboxProps } from './types';
+import { ComboboxItemBase, ComboboxProps } from './types';
 import './Combobox.css';
 
-export function Combobox<T extends ComboboxItem>({
+export function Combobox<T extends ComboboxItemBase>({
   items,
   selectedItem,
   onSelectedItemChange,
@@ -17,18 +17,18 @@ export function Combobox<T extends ComboboxItem>({
   disabled = false,
   loading = false,
   loadingText = 'Загрузка...',
-  itemToString = (item) => (item ? item.label : ''),
+  itemToString,
 }: ComboboxProps<T>) {
   const filteredItems = useMemo(() => {
-    if (!inputValue) {
+    if (!inputValue || !itemToString) {
       return items;
     }
 
     const lowerCasedInput = inputValue.toLowerCase();
     return items.filter((item) =>
-      item.label.toLowerCase().includes(lowerCasedInput)
+      itemToString(item).toLowerCase().includes(lowerCasedInput)
     );
-  }, [items, inputValue]);
+  }, [items, inputValue, itemToString]);
 
   const {
     isOpen,
@@ -55,11 +55,12 @@ export function Combobox<T extends ComboboxItem>({
     <div
       className={`combobox-item ${isHighlighted ? 'combobox-item--highlighted' : ''}`}
     >
-      {item.label}
+      {itemToString ? itemToString(item) : String(item.id)}
     </div>
   );
 
-  const defaultRenderSelectedItem = (item: T) => item.label;
+  const defaultRenderSelectedItem = (item: T) =>
+    itemToString ? itemToString(item) : String(item.id);
 
   return (
     <div className={`combobox ${className}`}>

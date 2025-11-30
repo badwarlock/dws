@@ -43,6 +43,7 @@ function App() {
       inputValue={inputValue}
       onInputValueChange={setInputValue}
       placeholder="Выберите фрукт..."
+      itemToString={(item) => (item ? item.label : '')}
     />
   );
 }
@@ -71,23 +72,72 @@ function App() {
 
 ### Типы
 
+Компонент поддерживает гибкую систему типизации с независимыми типами данных:
+
+#### Базовый интерфейс
+
 ```typescript
-interface ComboboxItem {
+interface ComboboxItemBase {
+  id: string | number;
+}
+```
+
+Это минимальное требование для любого типа, который можно использовать с Combobox.
+
+#### Встроенные типы
+
+**ComboboxItem** - стандартный тип для базового использования:
+
+```typescript
+interface ComboboxItem extends ComboboxItemBase {
   id: string | number;
   label: string;
   [key: string]: any;
 }
 ```
 
-Вы можете расширить `ComboboxItem` для добавления дополнительных полей:
+**Account** - независимый тип для банковских счетов:
 
 ```typescript
-interface User extends ComboboxItem {
-  id: number;
+interface Account {
+  id: string;
   label: string;
-  email: string;
-  role: string;
+  iban: string;
+  type: string;
+  internal_number: number;
 }
+```
+
+**CustomItem** - независимый тип для кастомных элементов:
+
+```typescript
+interface CustomItem {
+  id: string | number;
+  label: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+}
+```
+
+#### Создание собственных типов
+
+Вы можете создавать собственные независимые типы, главное требование - наличие поля `id`:
+
+```typescript
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+}
+
+// Использование
+<Combobox<Product>
+  items={products}
+  itemToString={(item) => item ? item.name : ''}
+  // ...
+/>
 ```
 
 ## Примеры использования
@@ -117,49 +167,55 @@ function BasicExample() {
 }
 ```
 
-### С кастомными элементами
+### С компонентом CustomItemRenderer
+
+Пример использования готового компонента `CustomItemRenderer` для отображения пользователей:
 
 ```tsx
-interface User extends ComboboxItem {
-  email: string;
-  role: string;
-}
+import { useState } from 'react';
+import { Combobox, CustomItemRenderer, CustomItem } from './src';
 
-function CustomRenderExample() {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+function CustomRendererExample() {
+  const [selectedItem, setSelectedItem] = useState<CustomItem | null>(null);
   const [inputValue, setInputValue] = useState('');
 
-  const users: User[] = [
-    { id: 1, label: 'Иван Иванов', email: 'ivan@example.com', role: 'Developer' },
-    { id: 2, label: 'Мария Петрова', email: 'maria@example.com', role: 'Designer' },
+  const items: CustomItem[] = [
+    {
+      id: 1,
+      label: 'Иван Иванов',
+      description: 'ivan@example.com • Разработчик',
+      color: '#3b82f6',
+    },
+    {
+      id: 2,
+      label: 'Мария Петрова',
+      description: 'maria@example.com • Дизайнер',
+      color: '#ec4899',
+    },
   ];
 
   return (
     <Combobox
-      items={users}
-      selectedItem={selectedUser}
-      onSelectedItemChange={setSelectedUser}
+      items={items}
+      selectedItem={selectedItem}
+      onSelectedItemChange={setSelectedItem}
       inputValue={inputValue}
       onInputValueChange={setInputValue}
-      renderItem={(user, isHighlighted) => (
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          backgroundColor: isHighlighted ? '#dbeafe' : 'transparent',
-          padding: '8px',
-        }}>
-          <div>
-            <div style={{ fontWeight: '500' }}>{user.label}</div>
-            <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              {user.email} • {user.role}
-            </div>
-          </div>
-        </div>
+      placeholder="Начните вводить имя..."
+      renderItem={(item, isHighlighted) => (
+        <CustomItemRenderer item={item} isHighlighted={isHighlighted} />
       )}
+      itemToString={(item) => (item ? `${item.label} ${item.description || ''}` : '')}
     />
   );
 }
 ```
+
+Компонент `CustomItemRenderer` предоставляет:
+- Круглую иконку с инициалами или кастомным значением
+- Настраиваемый цвет иконки
+- Название и описание
+- Анимацию при выделении
 
 ### С состоянием загрузки
 
@@ -228,7 +284,7 @@ function AsyncSearchExample() {
 
 ### С компонентом OptionAccount (Банковские счета)
 
-Пример использования с готовым компонентом `OptionAccount` для отображения банковских счетов:
+Пример использования независимого типа `Account` с готовым компонентом `OptionAccount`:
 
 ```tsx
 import { useState } from 'react';
@@ -277,10 +333,10 @@ function AccountExample() {
 }
 ```
 
-**Тип Account:**
+**Тип Account** (независимый тип, не наследуется от ComboboxItem):
 
 ```typescript
-interface Account extends ComboboxItem {
+interface Account {
   id: string;
   label: string;
   iban: string;
@@ -290,11 +346,12 @@ interface Account extends ComboboxItem {
 ```
 
 Компонент `OptionAccount` предоставляет:
-- Иконку с цветом в зависимости от типа счета
-- Форматированный IBAN
-- Бейдж с типом счета
+- Иконку с цветом в зависимости от типа счета (синий, зеленый, оранжевый, фиолетовый, голубой)
+- Форматированный IBAN (разбивка на блоки по 4 символа)
+- Бейдж с типом счета (Расчетный, Сберегательный, Кредитный, Депозитный, Текущий)
 - Внутренний номер счета
 - Анимацию при выделении
+- Иконку галочки при выделении
 
 ## Контролируемый компонент
 
@@ -313,6 +370,56 @@ interface Account extends ComboboxItem {
    - Состояние всегда синхронизировано
    - Легко интегрируется с формами
    - Простое тестирование
+
+## Архитектура независимых компонентов
+
+Ключевая особенность этого Combobox - **независимые типы данных и компоненты рендеринга**.
+
+### Принципы
+
+1. **Минимальные требования**: Combobox требует только наличие поля `id` (тип `ComboboxItemBase`)
+2. **Независимые типы**: `Account`, `CustomItem`, `ComboboxItem` - все независимы друг от друга
+3. **Специализированные компоненты**: `OptionAccount` и `CustomItemRenderer` - независимые компоненты для рендеринга
+4. **Гибкость**: Можно использовать любой тип данных, главное - указать `itemToString`
+
+### Преимущества
+
+- ✅ Нет жесткой привязки к структуре данных
+- ✅ Легко добавлять новые типы без изменения существующих
+- ✅ Каждый компонент рендеринга инкапсулирует свою логику
+- ✅ TypeScript полностью понимает типы и обеспечивает type safety
+- ✅ Масштабируемость - легко расширять функциональность
+
+### Пример создания нового типа и компонента
+
+```typescript
+// 1. Создаем тип (независимый)
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+}
+
+// 2. Создаем компонент рендеринга
+function ProductRenderer({ item, isHighlighted }: { item: Product; isHighlighted: boolean }) {
+  return (
+    <div style={{ backgroundColor: isHighlighted ? '#dbeafe' : 'transparent' }}>
+      <img src={item.image} alt={item.name} />
+      <div>{item.name}</div>
+      <div>${item.price}</div>
+    </div>
+  );
+}
+
+// 3. Используем с Combobox
+<Combobox<Product>
+  items={products}
+  renderItem={(item, highlighted) => <ProductRenderer item={item} isHighlighted={highlighted} />}
+  itemToString={(item) => item ? `${item.name} ${item.price}` : ''}
+  // ...
+/>
+```
 
 ## Стилизация
 
