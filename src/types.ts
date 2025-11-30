@@ -1,12 +1,7 @@
 import { ReactNode } from 'react';
 
-// Базовый интерфейс для элементов Combobox - минимальные требования
-export interface ComboboxItemBase {
-  id: string | number;
-}
-
 // Стандартный тип элемента с label для базового использования
-export interface ComboboxItem extends ComboboxItemBase {
+export interface ComboboxItem {
   id: string | number;
   label: string;
   [key: string]: any;
@@ -21,7 +16,7 @@ export interface Account {
   internal_number: number;
 }
 
-export interface ComboboxProps<T extends ComboboxItemBase> {
+export interface ComboboxProps<T> {
   items: T[];
   selectedItem: T | null;
   onSelectedItemChange: (item: T | null) => void;
@@ -36,4 +31,5 @@ export interface ComboboxProps<T extends ComboboxItemBase> {
   loading?: boolean;
   loadingText?: string;
   itemToString?: (item: T | null) => string;
+  getItemId?: (item: T) => string | number;
 }

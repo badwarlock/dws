@@ -1,9 +1,9 @@
 import { useCombobox } from 'downshift';
 import { useMemo } from 'react';
-import { ComboboxItemBase, ComboboxProps } from './types';
+import { ComboboxProps } from './types';
 import './Combobox.css';
 
-export function Combobox<T extends ComboboxItemBase>({
+export function Combobox<T>({
   items,
   selectedItem,
   onSelectedItemChange,
@@ -18,6 +18,7 @@ export function Combobox<T extends ComboboxItemBase>({
   loading = false,
   loadingText = 'Загрузка...',
   itemToString,
+  getItemId,
 }: ComboboxProps<T>) {
   const filteredItems = useMemo(() => {
     if (!inputValue || !itemToString) {
@@ -51,16 +52,28 @@ export function Combobox<T extends ComboboxItemBase>({
     },
   });
 
+  const getItemKey = (item: T, index: number): string | number => {
+    if (getItemId) {
+      return getItemId(item);
+    }
+    // Попытка получить id из объекта если он есть
+    if (item && typeof item === 'object' && 'id' in item) {
+      return (item as any).id;
+    }
+    // Fallback на index
+    return index;
+  };
+
   const defaultRenderItem = (item: T, isHighlighted: boolean) => (
     <div
       className={`combobox-item ${isHighlighted ? 'combobox-item--highlighted' : ''}`}
     >
-      {itemToString ? itemToString(item) : String(item.id)}
+      {itemToString ? itemToString(item) : JSON.stringify(item)}
     </div>
   );
 
   const defaultRenderSelectedItem = (item: T) =>
-    itemToString ? itemToString(item) : String(item.id);
+    itemToString ? itemToString(item) : JSON.stringify(item);
 
   return (
     <div className={`combobox ${className}`}>
@@ -118,7 +131,7 @@ export function Combobox<T extends ComboboxItemBase>({
             ) : (
               filteredItems.map((item, index) => (
                 <li
-                  key={item.id}
+                  key={getItemKey(item, index)}
                   {...getItemProps({
                     item,
                     index,
