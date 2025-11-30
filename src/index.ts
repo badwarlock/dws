@@ -1,2 +1,3 @@
 export { Combobox } from './Combobox';
-export type { ComboboxItem, ComboboxProps } from './types';
+export { OptionAccount } from './OptionAccount';
+export type { ComboboxItem, ComboboxProps, Account } from './types';

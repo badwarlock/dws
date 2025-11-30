@@ -226,6 +226,76 @@ function AsyncSearchExample() {
 }
 ```
 
+### С компонентом OptionAccount (Банковские счета)
+
+Пример использования с готовым компонентом `OptionAccount` для отображения банковских счетов:
+
+```tsx
+import { useState } from 'react';
+import { Combobox, OptionAccount, Account } from './src';
+
+function AccountExample() {
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [inputValue, setInputValue] = useState('');
+
+  const accounts: Account[] = [
+    {
+      id: 'acc-001',
+      label: 'Основной счет',
+      iban: 'RU1234567890123456789012',
+      type: 'checking',
+      internal_number: 40817810099910004312,
+    },
+    {
+      id: 'acc-002',
+      label: 'Сберегательный счет',
+      iban: 'RU9876543210987654321098',
+      type: 'savings',
+      internal_number: 42306810000000001234,
+    },
+  ];
+
+  return (
+    <Combobox
+      items={accounts}
+      selectedItem={selectedAccount}
+      onSelectedItemChange={setSelectedAccount}
+      inputValue={inputValue}
+      onInputValueChange={setInputValue}
+      placeholder="Начните вводить номер счета или IBAN..."
+      renderItem={(account, isHighlighted) => (
+        <OptionAccount account={account} isHighlighted={isHighlighted} />
+      )}
+      renderSelectedItem={(account) => (
+        <span>{account.label} • {account.iban}</span>
+      )}
+      itemToString={(account) =>
+        account ? `${account.label} ${account.iban} ${account.internal_number}` : ''
+      }
+    />
+  );
+}
+```
+
+**Тип Account:**
+
+```typescript
+interface Account extends ComboboxItem {
+  id: string;
+  label: string;
+  iban: string;
+  type: string; // 'checking' | 'savings' | 'credit' | 'deposit' | 'current'
+  internal_number: number;
+}
+```
+
+Компонент `OptionAccount` предоставляет:
+- Иконку с цветом в зависимости от типа счета
+- Форматированный IBAN
+- Бейдж с типом счета
+- Внутренний номер счета
+- Анимацию при выделении
+
 ## Контролируемый компонент
 
 Компонент является полностью контролируемым, что означает:

@@ -22,3 +22,11 @@ export interface ComboboxProps<T extends ComboboxItem> {
   loadingText?: string;
   itemToString?: (item: T | null) => string;
 }
+
+export interface Account extends ComboboxItem {
+  id: string;
+  label: string;
+  iban: string;
+  type: string;
+  internal_number: number;
+}

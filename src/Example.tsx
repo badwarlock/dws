@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Combobox } from './Combobox';
-import { ComboboxItem } from './types';
+import { ComboboxItem, Account } from './types';
+import { OptionAccount } from './OptionAccount';
+import './OptionAccount.css';
 
 interface User extends ComboboxItem {
   id: number;
@@ -108,7 +110,14 @@ export function Example() {
 
       <div style={{ marginBottom: '40px' }}>
         <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>
-          4. Отключенный компонент
+          4. С компонентом OptionAccount (Банковские счета)
+        </h2>
+        <AccountExample />
+      </div>
+
+      <div style={{ marginBottom: '40px' }}>
+        <h2 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600' }}>
+          5. Отключенный компонент
         </h2>
         <DisabledExample />
       </div>
@@ -178,6 +187,109 @@ function LoadingExample() {
       >
         {loading ? 'Показать данные' : 'Показать загрузку'}
       </button>
+    </div>
+  );
+}
+
+function AccountExample() {
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [inputValue, setInputValue] = useState('');
+
+  const accounts: Account[] = [
+    {
+      id: 'acc-001',
+      label: 'Основной счет',
+      iban: 'RU1234567890123456789012',
+      type: 'checking',
+      internal_number: 40817810099910004312,
+    },
+    {
+      id: 'acc-002',
+      label: 'Сберегательный счет',
+      iban: 'RU9876543210987654321098',
+      type: 'savings',
+      internal_number: 42306810000000001234,
+    },
+    {
+      id: 'acc-003',
+      label: 'Кредитная карта',
+      iban: 'RU1111222233334444555566',
+      type: 'credit',
+      internal_number: 45502810800000005678,
+    },
+    {
+      id: 'acc-004',
+      label: 'Депозитный счет',
+      iban: 'RU7777888899990000111122',
+      type: 'deposit',
+      internal_number: 42301810400000009876,
+    },
+    {
+      id: 'acc-005',
+      label: 'Текущий счет для бизнеса',
+      iban: 'RU3333444455556666777788',
+      type: 'current',
+      internal_number: 40702810300000003456,
+    },
+  ];
+
+  return (
+    <div>
+      <Combobox
+        items={accounts}
+        selectedItem={selectedAccount}
+        onSelectedItemChange={setSelectedAccount}
+        inputValue={inputValue}
+        onInputValueChange={setInputValue}
+        placeholder="Начните вводить номер счета или IBAN..."
+        renderItem={(account, isHighlighted) => (
+          <OptionAccount account={account} isHighlighted={isHighlighted} />
+        )}
+        renderSelectedItem={(account) => (
+          <span>
+            {account.label} • {account.iban}
+          </span>
+        )}
+        itemToString={(account) =>
+          account ? `${account.label} ${account.iban} ${account.internal_number}` : ''
+        }
+      />
+
+      {selectedAccount && (
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '16px',
+            backgroundColor: '#f9fafb',
+            borderRadius: '8px',
+            fontSize: '14px',
+          }}
+        >
+          <h3 style={{ marginBottom: '12px', fontWeight: '600', color: '#111827' }}>
+            Информация о выбранном счете:
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: '#374151' }}>
+            <div>
+              <span style={{ fontWeight: '500' }}>ID:</span> {selectedAccount.id}
+            </div>
+            <div>
+              <span style={{ fontWeight: '500' }}>Название:</span> {selectedAccount.label}
+            </div>
+            <div>
+              <span style={{ fontWeight: '500' }}>IBAN:</span>{' '}
+              <code style={{ backgroundColor: '#e5e7eb', padding: '2px 6px', borderRadius: '4px' }}>
+                {selectedAccount.iban}
+              </code>
+            </div>
+            <div>
+              <span style={{ fontWeight: '500' }}>Тип:</span> {selectedAccount.type}
+            </div>
+            <div>
+              <span style={{ fontWeight: '500' }}>Внутренний номер:</span> {selectedAccount.internal_number}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
