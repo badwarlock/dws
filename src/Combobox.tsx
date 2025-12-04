@@ -46,9 +46,26 @@ export function Combobox<T>({
     inputValue,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
       onSelectedItemChange(newSelectedItem ?? null);
+      // Очищаем поле поиска после выбора
+      onInputValueChange('');
     },
     onInputValueChange: ({ inputValue: newInputValue }) => {
       onInputValueChange(newInputValue ?? '');
+    },
+    // Не подставляем значение в input при выборе
+    stateReducer: (state, actionAndChanges) => {
+      const { type, changes } = actionAndChanges;
+
+      switch (type) {
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.ItemClick:
+          return {
+            ...changes,
+            inputValue: '', // Очищаем input при выборе
+          };
+        default:
+          return changes;
+      }
     },
   });
 
@@ -64,11 +81,28 @@ export function Combobox<T>({
     return index;
   };
 
-  const defaultRenderItem = (item: T, isHighlighted: boolean) => (
+  const defaultRenderItem = (item: T, isHighlighted: boolean, isSelected: boolean) => (
     <div
-      className={`combobox-item ${isHighlighted ? 'combobox-item--highlighted' : ''}`}
+      className={`combobox-item ${isHighlighted ? 'combobox-item--highlighted' : ''} ${
+        isSelected ? 'combobox-item--selected' : ''
+      }`}
     >
       {itemToString ? itemToString(item) : JSON.stringify(item)}
+      {isSelected && (
+        <svg
+          className="combobox-item-check"
+          width="16"
+          height="16"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clipRule="evenodd"
+          />
+        </svg>
+      )}
     </div>
   );
 
@@ -140,20 +174,46 @@ export function Combobox<T>({
               ) : filteredItems.length === 0 ? (
                 <li className="combobox-no-results">{noResultsText}</li>
               ) : (
-                filteredItems.map((item, index) => (
-                  <li
-                    key={getItemKey(item, index)}
-                    {...getItemProps({
-                      item,
-                      index,
-                      className: 'combobox-item-wrapper',
-                    })}
-                  >
-                    {renderItem
-                      ? renderItem(item, highlightedIndex === index)
-                      : defaultRenderItem(item, highlightedIndex === index)}
-                  </li>
-                ))
+                filteredItems.map((item, index) => {
+                  const isSelected = selectedItem === item;
+                  const isHighlighted = highlightedIndex === index;
+
+                  return (
+                    <li
+                      key={getItemKey(item, index)}
+                      {...getItemProps({
+                        item,
+                        index,
+                        className: `combobox-item-wrapper ${
+                          isSelected ? 'combobox-item-wrapper--selected' : ''
+                        }`,
+                      })}
+                    >
+                      {renderItem ? (
+                        <div className="combobox-item-container">
+                          {renderItem(item, isHighlighted)}
+                          {isSelected && (
+                            <svg
+                              className="combobox-item-check"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      ) : (
+                        defaultRenderItem(item, isHighlighted, isSelected)
+                      )}
+                    </li>
+                  );
+                })
               )}
             </ul>
           </>
