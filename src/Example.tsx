@@ -124,7 +124,6 @@ function CustomRendererExample() {
       renderItem={(item, isHighlighted) => (
         <CustomItemRenderer item={item} isHighlighted={isHighlighted} />
       )}
-      renderSelectedItem={(item) => <span>{item.label}</span>}
       itemToString={(item) => (item ? `${item.label} ${item.description || ''}` : '')}
     />
   );
@@ -226,11 +225,6 @@ function AccountExample() {
         placeholder="Начните вводить номер счета или IBAN..."
         renderItem={(account, isHighlighted) => (
           <OptionAccount account={account} isHighlighted={isHighlighted} />
-        )}
-        renderSelectedItem={(account) => (
-          <span>
-            {account.label} • {account.iban}
-          </span>
         )}
         itemToString={(account) =>
           account ? `${account.label} ${account.iban} ${account.internal_number}` : ''

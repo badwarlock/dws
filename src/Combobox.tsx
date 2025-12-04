@@ -90,17 +90,15 @@ export function Combobox<T>({
         })}
         type="button"
       >
-        <span className="combobox-trigger-content">
-          {selectedItem ? (
-            renderSelectedItem ? (
-              renderSelectedItem(selectedItem)
-            ) : (
-              defaultRenderSelectedItem(selectedItem)
-            )
-          ) : (
-            <span className="combobox-trigger-placeholder">{placeholder}</span>
-          )}
-        </span>
+        {selectedItem ? (
+          <div className="combobox-trigger-content">
+            {renderItem
+              ? renderItem(selectedItem, false)
+              : defaultRenderItem(selectedItem, false)}
+          </div>
+        ) : (
+          <span className="combobox-trigger-placeholder">{placeholder}</span>
+        )}
         <svg
           className={`combobox-arrow ${isOpen ? 'combobox-arrow--open' : ''}`}
           width="20"
