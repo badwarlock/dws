@@ -12,125 +12,143 @@
   color: #374151;
 }
 
-.combobox-input-wrapper {
-  position: relative;
+/* Триггер - кнопка, которая открывает меню */
+.combobox-trigger {
+  width: 100%;
   display: flex;
   align-items: center;
-}
-
-.combobox-input {
-  width: 100%;
-  padding: 10px 40px 10px 12px;
+  justify-content: space-between;
+  padding: 10px 12px;
   font-size: 14px;
   line-height: 20px;
+  text-align: left;
   color: #111827;
   background-color: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  outline: none;
+  cursor: pointer;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.combobox-input:hover {
+.combobox-trigger:hover:not(:disabled) {
   border-color: #9ca3af;
 }
 
-.combobox-input:focus {
+.combobox-trigger:focus {
+  outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.combobox-input:disabled {
+.combobox-trigger--open {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.combobox-trigger:disabled {
   background-color: #f3f4f6;
   color: #6b7280;
   cursor: not-allowed;
 }
 
-.combobox-input::placeholder {
+.combobox-trigger-content {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combobox-trigger-placeholder {
   color: #9ca3af;
 }
 
-.combobox-toggle-button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #6b7280;
-  transition: color 0.15s ease-in-out;
-}
-
-.combobox-toggle-button:hover:not(:disabled) {
-  color: #374151;
-}
-
-.combobox-toggle-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .combobox-arrow {
+  flex-shrink: 0;
+  margin-left: 8px;
   transition: transform 0.2s ease-in-out;
+  color: #6b7280;
 }
 
 .combobox-arrow--open {
   transform: rotate(180deg);
 }
 
-.combobox-selected-item {
-  margin-top: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  color: #059669;
-  background-color: #d1fae5;
-  border-radius: 6px;
-}
-
+/* Выпадающее меню */
 .combobox-menu {
   position: absolute;
   z-index: 1000;
   width: 100%;
-  max-height: 0;
   margin: 4px 0 0;
-  padding: 0;
-  overflow: hidden;
-  list-style: none;
   background-color: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transition: max-height 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .combobox-menu--open {
-  max-height: 300px;
-  overflow-y: auto;
   opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-.combobox-menu::-webkit-scrollbar {
+/* Поле поиска внутри меню */
+.combobox-search-wrapper {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 6px 6px 0 0;
+}
+
+.combobox-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #111827;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.combobox-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.combobox-search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Список элементов внутри меню */
+.combobox-items-list {
+  max-height: 250px;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.combobox-items-list::-webkit-scrollbar {
   width: 8px;
 }
 
-.combobox-menu::-webkit-scrollbar-track {
+.combobox-items-list::-webkit-scrollbar-track {
   background: #f3f4f6;
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 0 6px 0;
 }
 
-.combobox-menu::-webkit-scrollbar-thumb {
+.combobox-items-list::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 4px;
 }
 
-.combobox-menu::-webkit-scrollbar-thumb:hover {
+.combobox-items-list::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 

@@ -81,72 +81,86 @@ export function Combobox<T>({
         Выберите элемент:
       </div>
 
-      <div className="combobox-input-wrapper">
-        <input
-          {...getInputProps({
-            disabled,
-            placeholder,
-            className: 'combobox-input',
-          })}
-          value={inputValue}
-        />
-
-        <button
-          {...getToggleButtonProps({
-            disabled,
-            className: 'combobox-toggle-button',
-            'aria-label': 'Открыть меню',
-          })}
-          type="button"
+      {/* Триггер - показывает выбранный элемент или placeholder */}
+      <button
+        {...getToggleButtonProps({
+          disabled,
+          className: `combobox-trigger ${isOpen ? 'combobox-trigger--open' : ''}`,
+          'aria-label': 'Открыть меню',
+        })}
+        type="button"
+      >
+        <span className="combobox-trigger-content">
+          {selectedItem ? (
+            renderSelectedItem ? (
+              renderSelectedItem(selectedItem)
+            ) : (
+              defaultRenderSelectedItem(selectedItem)
+            )
+          ) : (
+            <span className="combobox-trigger-placeholder">{placeholder}</span>
+          )}
+        </span>
+        <svg
+          className={`combobox-arrow ${isOpen ? 'combobox-arrow--open' : ''}`}
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="currentColor"
         >
-          <svg
-            className={`combobox-arrow ${isOpen ? 'combobox-arrow--open' : ''}`}
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-          </svg>
-        </button>
-      </div>
+          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+        </svg>
+      </button>
 
-      {selectedItem && !isOpen && (
-        <div className="combobox-selected-item">
-          Выбрано: {renderSelectedItem ? renderSelectedItem(selectedItem) : defaultRenderSelectedItem(selectedItem)}
-        </div>
-      )}
-
-      <ul
+      {/* Выпадающее меню с поиском внутри */}
+      <div
         {...getMenuProps({
           className: `combobox-menu ${isOpen ? 'combobox-menu--open' : ''}`,
         })}
       >
         {isOpen && (
           <>
-            {loading ? (
-              <li className="combobox-loading">{loadingText}</li>
-            ) : filteredItems.length === 0 ? (
-              <li className="combobox-no-results">{noResultsText}</li>
-            ) : (
-              filteredItems.map((item, index) => (
-                <li
-                  key={getItemKey(item, index)}
-                  {...getItemProps({
-                    item,
-                    index,
-                    className: 'combobox-item-wrapper',
-                  })}
-                >
-                  {renderItem
-                    ? renderItem(item, highlightedIndex === index)
-                    : defaultRenderItem(item, highlightedIndex === index)}
-                </li>
-              ))
-            )}
+            {/* Поле поиска внутри меню */}
+            <div className="combobox-search-wrapper">
+              <input
+                {...getInputProps({
+                  disabled,
+                  placeholder: 'Поиск...',
+                  className: 'combobox-search-input',
+                  onClick: (e) => {
+                    e.stopPropagation();
+                  },
+                })}
+                value={inputValue}
+              />
+            </div>
+
+            {/* Список элементов */}
+            <ul className="combobox-items-list">
+              {loading ? (
+                <li className="combobox-loading">{loadingText}</li>
+              ) : filteredItems.length === 0 ? (
+                <li className="combobox-no-results">{noResultsText}</li>
+              ) : (
+                filteredItems.map((item, index) => (
+                  <li
+                    key={getItemKey(item, index)}
+                    {...getItemProps({
+                      item,
+                      index,
+                      className: 'combobox-item-wrapper',
+                    })}
+                  >
+                    {renderItem
+                      ? renderItem(item, highlightedIndex === index)
+                      : defaultRenderItem(item, highlightedIndex === index)}
+                  </li>
+                ))
+              )}
+            </ul>
           </>
         )}
-      </ul>
+      </div>
     </div>
   );
 }
